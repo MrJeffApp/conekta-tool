@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+        <title>Mr Jeff | Conekta tool</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+        <style>
+            .title {
+                padding: 20px 20px;
+            }
+
+            .tool {
+                width: 100%;
+                max-width: 350px;
+                padding: 15px;
+                margin: auto;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="">
+            <div class="title">
+                <h1 class="h3 text-center">Conekta card token generator</h1>
+            </div>
+            <form id="showForm" class="tool">
+                <div class="form-group">
+                    <label for="inputToken">Conekta public key:</label>
+                    <input id="inputToken" class="form-control" placeholder="Conekta public key">
+                </div>
+                <button class="btn btn-primary btn-block" type="submit">Show credit card form</button>
+            </form>
+            <form id="cardForm" class="tool d-none">
+                <div class="form-group">
+                    <label for="cardholderName">Card holder name:</label>
+                    <input class="form-control" type="text" id="cardholderName" data-checkout="cardholderName" value="Fulanito Fulano" />
+                </div>
+                <div class="form-group">
+                    <label for="cardNumber">Credit card number:</label>
+                    <input class="form-control" type="text" id="cardNumber" data-checkout="cardNumber" value="4242424242424242" />
+                </div>
+                <div class="form-group">
+                    <label for="securityCode">Security code:</label>
+                    <input class="form-control" type="text" id="securityCode" data-checkout="securityCode" value="123" autocomplete=off />
+                </div>
+                <div class="form-group">
+                    <label for="cardExpirationMonth">Expiration month:</label>
+                    <input class="form-control" type="text" id="cardExpirationMonth" data-checkout="cardExpirationMonth" value="12" autocomplete=off />
+                </div>
+                <div class="form-group">
+                    <label for="cardExpirationYear">Expiration year:</label>
+                    <input class="form-control" type="text" id="cardExpirationYear" data-checkout="cardExpirationYear" value="2024" autocomplete=off />
+                </div>
+                <button class="btn btn-primary" type="submit">Generate card token</button>
+            </form>
+            <form id="tokenForm" class="tool d-none">
+                <div class="form-group">
+                    <label for="createdTokenInput">Generated token:</label>
+                    <input type="text" id="createdTokenInput" class="form-control" readonly/>
+                </div>
+                <button class="btn btn-primary" type="submit">Generate new token</button>
+            </form>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="https://cdn.conekta.io/js/latest/conekta.js"></script>
+        <script type="text/javascript">
+            $(function() {
+                console.log("Tool ready");
+                $("#showForm").submit(function( event ) {
+                    event.preventDefault();
+                    var publicToken = $("#inputToken").val();
+                    console.log("Public key: " + publicToken);
+                    Conekta.setPublicKey(publicToken);
+                    $("#cardForm").toggleClass("d-none");
+                    $("#showForm").toggleClass("d-none");
+                });
+
+                $("#cardForm").submit(function( event ) {
+                    event.preventDefault();
+
+                    var cardNumber = $("#cardNumber").val();
+                    var securityCode = $("#securityCode").val();
+                    var cardExpirationMonth = $("#cardExpirationMonth").val();
+                    var cardExpirationYear = $("#cardExpirationYear").val();
+                    var cardholderName = $("#cardholderName").val();
+
+                    var tokenParams = {
+                        "card": {
+                            "name": cardholderName,
+                            "number": cardNumber,
+                            "exp_year": cardExpirationYear,
+                            "exp_month": cardExpirationMonth,
+                            "cvc": securityCode
+                            }
+                        }
+
+                    Conekta.Token.create(tokenParams, function(token) {
+                        console.log("Token: " + JSON.stringify(token));
+                        $("#createdTokenInput").val(token.id);
+                        $("#cardForm").toggleClass("d-none");
+                        $("#tokenForm").toggleClass("d-none");
+                    }, function(error) {
+                        console.log("Error: " + JSON.stringify(error));
+                    });
+
+                });
+
+                $("#tokenForm").submit(function( event ) {
+                    event.preventDefault();
+                    $("#tokenForm").toggleClass("d-none");
+                    $("#showForm").toggleClass("d-none");
+                });
+
+            });
+        </script>
+    </body>
+</html>
