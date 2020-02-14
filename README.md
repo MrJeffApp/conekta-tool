@@ -1,3 +1,3 @@
 # conekta-tool
-Conekta card token generator
-https://mrjeffapp.github.io/conekta-tool/
+Conekta card token generator tool
+https://jeff-labs.github.io/conekta-tool/
